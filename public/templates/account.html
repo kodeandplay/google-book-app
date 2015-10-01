@@ -1,0 +1,38 @@
+<h1>My Books! <span class='glyphicon glyphicon-book'></span></h1>
+<form role='form'>
+	<div class='form-group'>
+		<div class='input-group' style='margin-bottom:5px'>
+			<input placeholder='title' type='text' ng-model='searchQuery' class='form-control' />
+			<span class='input-group-btn'>
+				<button class='btn btn-default' ng-click='query(searchQuery)'>Search</button>
+			</span>
+		</div>
+	</div>
+</form>
+<form role='form'>
+	<div class='form-group'>
+		<div class='input-group'>
+			<input placeholder='list name' type='text' ng-model='listName' class='form-control' />
+			<span class='input-group-btn'>
+				<button class='btn btn-default' ng-click='addList(listName)'>Add List</button>
+			</span>
+		</div>
+	</div>
+</form>
+<ul class='list-group'>
+	<li class='list-group-item' ng-repeat='book in myBooks'>
+		<strong>{{ book.title | limitTo: 50 }}{{ book.title.length > 50 ? '...' : '' }} </strong>
+		<span>{{ book.author }}</span>
+		<small style='color:green'>{{ book.publishedDate }}</small>
+		<div class='form-group pull-right' >
+			<small ng-click='addBookToList($index,listSelection)' class='pull-left' style='margin-right:5px'>
+				<span class='glyphicon glyphicon-plus'></span>
+			</small>
+			<select class='form-control' ng-model='listSelection' style='width:200px;height:25px'>
+				<option ng-repeat='list in myLists' value='{{ list.list_id }}'> 
+					{{ list.list_name }}
+				</option>
+			</select>
+		</div>
+	</li>
+</ul>
