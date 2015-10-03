@@ -5,6 +5,8 @@ angular.module('App').controller('LoginCtrl', ['$location','$scope','UserService
 		if(!username || !password) return;
 
 		UserService.login(username, password).success(function(data) {
+			if(!data.bSuccess) return;
+
 			$scope.$emit('login', data.user);
 			$location.path('/account');
 		});
