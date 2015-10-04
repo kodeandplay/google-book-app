@@ -4,6 +4,10 @@ var express = require('express'),
 		routes = require('./routes');
 		
 var app = express();
+
+// Disable 'x-powered-by' response header (possible security hole). The client does not need to know what we are running.
+app.set('x-powered-by', false);
+
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true}));
