@@ -1,7 +1,8 @@
 var express = require('express'),
 		bodyParser = require('body-parser'),
 		auth = require('./auth'),
-		routes = require('./routes');
+		routes = require('./routes'),
+		port = process.env.port || 3000;
 		
 var app = express();
 
@@ -16,6 +17,6 @@ app.use(auth);
 app.use('/api/user', routes.user);
 app.use('/api/account', routes.account);
 
-app.listen(3000, function() {
-  console.log('Server listening on port %d', 3000);
+app.listen(port, function() {
+  console.log('Server listening on port %d', port);
 });
