@@ -1,36 +1,55 @@
 var pool = require('../pool'),
+		checkRedis = require('../redis'),
 		jwt = require('jwt-simple'),
 		bcrypt = require('bcrypt'),
 		config = require('../config');
 
+
 var getAllLists = function(options, cb) {
+	var username = options.username; 
 
-	pool.getConnection(function(err, db) {
+	var redisKey = 'lists:' + username;
+	checkRedis(redisKey, function(err, result, redisClient) {
+		if(err) { return cb(err) }
 
-		if(err) {
-			console.log('Error:', err);
-			return cb(err);
+		if(!err && !result) {
+
+			pool.getConnection(function(err, db) {
+
+				if(err) {
+					console.log('Error:', err);
+					return cb(err);
+				}
+
+				var sql = 'SELECT list_id, list_name FROM list INNER JOIN user USING (user_id) WHERE username = ?';
+				db.query({
+					sql: sql,
+					values: [username]
+				}, function(err, results, fields) {
+
+					db.release();
+
+					if(err) {
+						console.log('Error:', err);
+						return cb(err);
+					}
+
+					var data = { lists: JSON.stringify(results) };
+					redisClient.hmset(redisKey, data, function(err, result) {
+						console.log('Saved to redis:', redisKey);
+					});
+
+					cb(null, results); 
+				});
+
+			}); 
+
+		} else if(!!result) {
+
+			cb(null, JSON.parse(result.lists));
 		}
-
-		var sql = 'SELECT list_id, list_name FROM list INNER JOIN user USING (user_id) WHERE username = ?';
-		db.query({
-			sql: sql,
-			values: [options.username]
-		}, function(err, results, fields) {
-
-			db.release();
-
-			if(err) {
-				console.log('Error:', err);
-				return cb(err);
-			}
-
-			cb(null, results); 
-		});
-
 	});
-}; 
-
+}; // end getAllLists 
 
 var getBooksForList = function(options, cb) {
 	
